@@ -1,6 +1,8 @@
 package com.example.gestor.controller;
 
 import com.example.gestor.model.Proyecto;
+import com.example.gestor.model.Tarea;
+
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
 public class ProyectoController {
 
     private List<Proyecto> proyectos = new ArrayList<>();
+    private int siguienteId = 1;
 
     public ProyectoController() {
         proyectos.add(new Proyecto(1, "Alpha", "Primer proyecto", true, 3));
@@ -17,9 +20,19 @@ public class ProyectoController {
         proyectos.add(new Proyecto(3, "Gamma", "Tercer proyecto", true, 5));
     }
 
-    @GetMapping()
-    public List<Proyecto> listarProyectos() {
-        return proyectos;
+    @GetMapping
+    public List<Proyecto> listarProyectos(
+            @RequestParam(name = "activo", required = false) Boolean activo) {
+        if (activo == null) {
+            return proyectos;
+        }
+        List<Proyecto> resultado = new ArrayList<>();
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.isActivo() == activo) {
+                resultado.add(proyecto);
+            }
+        }
+        return resultado;
     }
 
     @GetMapping("/{id}")
@@ -53,7 +66,29 @@ public class ProyectoController {
 
     @PostMapping
     public Proyecto crearProyecto(@RequestBody Proyecto proyecto) {
+        proyecto.setId(siguienteId);
+        siguienteId = siguienteId + 1;
         proyectos.add(proyecto);
         return proyecto;
+    }
+
+    @PutMapping("/{id}")
+    public Proyecto actualizar(
+            @PathVariable(name = "id") int id,
+            @RequestBody Proyecto datos) {
+
+        for (int i = 0; i < proyectos.size(); i++) {
+            if (proyectos.get(i).getId() == id) {
+                datos.setId(id);
+                proyectos.set(i, datos);
+                return datos;
+            }
+        }
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable(name = "id") int id) {
+        proyectos.removeIf(proyecto -> proyecto.getId() == id);
     }
 }
