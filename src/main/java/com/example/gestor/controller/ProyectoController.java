@@ -1,8 +1,6 @@
 package com.example.gestor.controller;
 
 import com.example.gestor.model.Proyecto;
-import com.example.gestor.model.Tarea;
-
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
